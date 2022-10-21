@@ -1,0 +1,44 @@
+- defaultTab: nodes
+  description: ''
+  executionEnabled: true
+  id: ff8e266a-50a5-4ea1-8402-1527e64a3815
+  loglevel: INFO
+  name: Update
+  nodeFilterEditable: false
+  options:
+  - delimiter: ','
+    multivalued: true
+    name: hostname
+    required: true
+  plugins:
+    ExecutionLifecycle: null
+  scheduleEnabled: true
+  sequence:
+    commands:
+    - jobref:
+        group: ''
+        importOptions: true
+        name: Inventory
+        nodeStep: 'true'
+        uuid: d78515d2-9dc7-419b-be14-ba2ad078e3c7
+    - configuration:
+        ansible-become: 'false'
+        ansible-extra-param: -i /tmp/${job.execid}.hosts.yaml --limit *
+        ansible-playbook-inline: "- name: Test play\n  hosts: all\n  gather_facts:\
+          \ true\n  vars:\n    ansible_python_interpreter: /usr/bin/env python\n \
+          \   \n  tasks:\n  - name: Upgrade all RHEL packages\n    become: true\n\
+          \    become_user: root\n    ansible.builtin.yum:\n      name: '*'\n    \
+          \  state: latest\n    when: ansible_facts['os_family'] == \"RedHat\"\n\n\
+          \  - name: Upgrade all Debian packages\n    become: true\n    become_user:\
+          \ root\n    ansible.builtin.apt:\n      name: \"*\"\n      state: latest\n\
+          \    when: ansible_facts['os_family'] == \"Debian\"\n    \n  - name: Upgrade\
+          \ the OS (Debian)\n    become: true\n    become_user: root\n    ansible.builtin.apt:\n\
+          \      upgrade: dist\n    when: ansible_facts['os_family'] == \"Debian\""
+        ansible-ssh-passphrase-option: option.password
+        ansible-ssh-use-agent: 'false'
+      nodeStep: true
+      type: com.batix.rundeck.plugins.AnsiblePlaybookInlineWorkflowNodeStep
+    keepgoing: false
+    strategy: node-first
+  uuid: ff8e266a-50a5-4ea1-8402-1527e64a3815
+

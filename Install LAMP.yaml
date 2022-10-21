@@ -1,0 +1,40 @@
+- defaultTab: nodes
+  description: ''
+  executionEnabled: true
+  id: 6d1ec100-00d6-4f39-acc1-1aca62640341
+  loglevel: INFO
+  name: Install LAMP
+  nodeFilterEditable: false
+  options:
+  - delimiter: ','
+    multivalued: true
+    name: hostname
+    required: true
+    value: 10.0.0.247
+  plugins:
+    ExecutionLifecycle: null
+  scheduleEnabled: true
+  sequence:
+    commands:
+    - jobref:
+        group: ''
+        importOptions: true
+        name: Install Mariadb
+        nodeStep: 'true'
+        uuid: 247c9d96-93d8-4f4b-bf82-6eb032ff9226
+    - jobref:
+        group: ''
+        importOptions: true
+        name: Install httpd
+        nodeStep: 'true'
+        uuid: 12c15307-870b-4492-ae1f-f922696f9298
+    - jobref:
+        group: ''
+        importOptions: true
+        name: Install php
+        nodeStep: 'true'
+        uuid: d23110a5-80c9-459d-9b74-fe15e0cea8e7
+    keepgoing: false
+    strategy: node-first
+  uuid: 6d1ec100-00d6-4f39-acc1-1aca62640341
+

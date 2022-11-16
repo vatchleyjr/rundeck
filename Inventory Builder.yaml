@@ -1,0 +1,30 @@
+- defaultTab: output
+  description: ''
+  executionEnabled: true
+  id: 308b33f2-f7c6-4ae6-bed2-bec4525faffe
+  loglevel: INFO
+  loglimit: '5'
+  loglimitAction: truncate
+  loglimitStatus: failed
+  name: Inventory Builder
+  nodeFilterEditable: false
+  plugins:
+    ExecutionLifecycle: null
+  scheduleEnabled: true
+  sequence:
+    commands:
+    - script: "inventory_output()\n{\n    ip=$1\n    nc -vz $ip 22\n    [ $? -eq 0\
+        \ ] && echo \"$ip:\n  nodename: $ip\n  hostname: $ip\n  osVersion: 3.10.0-1160.15.2.el7.x86_64\n\
+        \  osFamily: unix\n  osArch: amd64\n  description: Execution Node\n  osName:\
+        \ Linux\n  username: user\n  tags: 'shared,ansible,python'\n  ssh-authentication:\
+        \ 'password'\n  ssh-password-storage-path: 'keys/users/user.pwd'\n  \" >>\
+        \ inventory.yaml\n}\n\nis_alive_ping()\n{\n  ping -c 1 $1 #> /dev/null\n \
+        \ #[ $? -eq 0 ] && echo $i,Up;\n  [ $? -eq 0 ] && inventory_output $i;sleep\
+        \ 1\n  [ $? -eq 1 ] && echo $i,Down\n}\n\nrm inventory.yaml -fv\n\nfor i in\
+        \ 10.211.55.{1..254}\n    do\n        is_alive_ping $i & disown\n    done\n\
+        \    \nfor i in 10.0.0.{1..254}\n    do\n        is_alive_ping $i & disown\n\
+        \    done\n    "
+    keepgoing: false
+    strategy: node-first
+  uuid: 308b33f2-f7c6-4ae6-bed2-bec4525faffe
+

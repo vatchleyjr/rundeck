@@ -4,7 +4,7 @@
   id: 12c15307-870b-4492-ae1f-f922696f9298
   loglevel: INFO
   multipleExecutions: true
-  name: Install httpd
+  name: Install Apache
   nodeFilterEditable: false
   options:
   - delimiter: ','
@@ -26,7 +26,7 @@
     - configuration:
         ansible-become: 'false'
         ansible-extra-param: -i /tmp/${job.execid}.hosts.yaml --limit *
-        ansible-playbook-inline: "- name: Test play\n  hosts: all\n  gather_facts:\
+        ansible-playbook-inline: "- name: Gathering Facts\n  hosts: all\n  gather_facts:\
           \ true\n  vars:\n    ansible_python_interpreter: /usr/bin/env python\n \
           \   \n  tasks:\n  - name: Install the latest version of httpd on RHEL\n\
           \    become: true\n    become_user: root\n    ansible.builtin.package:\n\

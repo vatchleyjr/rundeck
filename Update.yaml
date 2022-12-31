@@ -1,5 +1,63 @@
-- defaultTab: nodes
-  description: ''
+- defaultTab: output
+  description: |-
+    You will need to generate an inventory file. There are a few examples under the readme section
+
+    ---
+    Example 1<br/>
+    <code>
+    ---
+    all:
+      children:
+        servers:
+          hosts:
+            10.211.55.55:
+            10.211.55.60:
+      vars:
+        ansible_user: username
+        ansible_password: password
+        ansible_connection: winrm
+        ansible_winrm_transport: kerberos
+        ansible_port: 5985
+    </code>
+    <hr />
+    Example 2<br/>
+    <code>
+    ---
+    all:
+      children:
+        servers:
+          hosts:
+            10.211.55.55:
+              ansible_connection: winrm
+              ansible_winrm_transport: kerberos
+              ansible_port: 5985
+            10.211.55.56:
+              ansible_connection: ssh
+              ansible_python_interpreter: /usr/bin/env python
+      vars:
+        ansible_user: username
+        ansible_password: Ppssword
+    </code>
+    <hr />
+    Example 3<br/>
+    <code>
+    ---
+    all:
+      children:
+        servers:
+          hosts:
+            10.211.55.55:
+              ansible_user: winrm-username
+              ansible_password: winrm-password
+              ansible_connection: winrm
+              ansible_winrm_transport: kerberos
+              ansible_port: 5985
+            10.211.55.56:
+              ansible_user: ssh-username
+              ansible_password: ssh-Password
+              ansible_connection: ssh
+              ansible_python_interpreter: /usr/bin/env python
+    </code>
   executionEnabled: true
   id: ff8e266a-50a5-4ea1-8402-1527e64a3815
   loglevel: INFO
@@ -24,16 +82,29 @@
     - configuration:
         ansible-become: 'false'
         ansible-extra-param: -i /tmp/${job.execid}.hosts.yaml --limit *
-        ansible-playbook-inline: "- name: Test play\n  hosts: all\n  gather_facts:\
+        ansible-playbook-inline: "- name: Gather Facts\n  hosts: all\n  gather_facts:\
           \ true\n  vars:\n    ansible_python_interpreter: /usr/bin/env python\n \
-          \   \n  tasks:\n  - name: Upgrade all RHEL packages\n    become: true\n\
-          \    become_user: root\n    ansible.builtin.yum:\n      name: '*'\n    \
-          \  state: latest\n    when: ansible_facts['os_family'] == \"RedHat\"\n\n\
-          \  - name: Upgrade all Debian packages\n    become: true\n    become_user:\
-          \ root\n    ansible.builtin.apt:\n      name: \"*\"\n      state: latest\n\
-          \    when: ansible_facts['os_family'] == \"Debian\"\n    \n  - name: Upgrade\
-          \ the OS (Debian)\n    become: true\n    become_user: root\n    ansible.builtin.apt:\n\
-          \      upgrade: dist\n    when: ansible_facts['os_family'] == \"Debian\""
+          \   \n  tasks:\n  - name: Install updates\n    block:\n      - name: RHEL\
+          \ Upgrade all Packages\n        ansible.builtin.yum:\n          name: '*'\n\
+          \          state: latest\n        register: update_result\n        \n  \
+          \    - debug: \n          var: update_result.results\n    when: ansible_facts['os_family']\
+          \ == \"RedHat\"\n    become: true\n    become_user: root\n\n  - name: Install\
+          \ updates\n    block:\n      - name: Debian Upgrade all Packages\n     \
+          \   ansible.builtin.apt:\n          name: \"*\"\n          state: latest\n\
+          \        register: update_result\n      \n      - debug: \n          var:\
+          \ update_result.results\n      \n      - name: Debian Upgrade the OS\n \
+          \       ansible.builtin.apt:\n          upgrade: dist\n        register:\
+          \ update_result\n      \n      - debug: \n          var: update_result.results\n\
+          \    when: ansible_facts['os_family'] == \"Debian\"\n    become: true\n\
+          \    become_user: root\n\n  - name: Install updates\n    block:\n      -\
+          \ name: Windows Install all updates\n        win_updates:\n          category_names:\n\
+          \          - Application\n          - CriticalUpdates\n          - DefinitionUpdates\n\
+          \          - SecurityUpdates\n          - Updates\n        register: update_result\n\
+          \    \n      - debug: \n          var: update_result\n          \n     \
+          \ - name: Windows reboot host if required\n        win_reboot:\n       \
+          \   #reboot_timeout: 10\n        when: update_result.reboot_required\n \
+          \   when: ansible_facts['os_family'] == \"Windows\"\n    become: yes\n \
+          \   become_method: runas\n    become_user: SYSTEM"
         ansible-ssh-passphrase-option: option.password
         ansible-ssh-use-agent: 'false'
       nodeStep: true

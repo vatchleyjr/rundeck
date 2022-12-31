@@ -26,25 +26,25 @@
     - configuration:
         ansible-become: 'false'
         ansible-extra-param: -i /tmp/${job.execid}.hosts.yaml --limit *
-        ansible-playbook-inline: "- name: Test play\n  hosts: all\n  gather_facts:\
-          \ true\n  vars:\n    ansible_python_interpreter: /usr/bin/env python\n \
-          \   \n  tasks:\n  - name: Install the latest version of php on RHEL\n  \
-          \  become: true\n    become_user: root\n    ansible.builtin.package:\n \
-          \     name:\n        - php7.4\n        - php7.4-mysql\n        - php-common\n\
+        ansible-playbook-inline: "- name: Gathering Facts\n  hosts: all\n  gather_facts:\
+          \ true\n  #vars:\n    #ansible_python_interpreter: /usr/bin/env python\n\
+          \    \n  tasks:\n  - name: Install the latest version of php on RHEL\n \
+          \   become: true\n    become_user: root\n    ansible.builtin.package:\n\
+          \      name:\n        #- libapache2-mod-php7.4\n        - php\n        -\
+          \ php-cli\n        - php-common\n        - php-devel\n        #- php-json\n\
+          \        #- php-opcache\n        - php-mysql\n      state: latest\n    when:\
+          \ ansible_facts['os_family'] == \"RedHat\"\n    \n  - name: Restart httpd\
+          \ on RHEL\n    become: true\n    become_user: root\n    ansible.builtin.service:\n\
+          \      name: httpd\n      state: restarted\n    when: ansible_facts['os_family']\
+          \ == \"RedHat\"\n\n  - name: Install the latest version of php on Debian\n\
+          \    become: true\n    become_user: root\n    ansible.builtin.package:\n\
+          \      name:\n        - php7.4\n        - php7.4-mysql\n        - php-common\n\
           \        - php7.4-cli\n        - php7.4-json\n        - php7.4-common\n\
           \        - php7.4-opcache\n        - libapache2-mod-php7.4\n      state:\
-          \ latest\n    when: ansible_facts['os_family'] == \"RedHat\"\n    \n  -\
-          \ name: Restart httpd on RHEL\n    become: true\n    become_user: root\n\
-          \    ansible.builtin.service:\n      name: httpd\n      state: restarted\n\
-          \    when: ansible_facts['os_family'] == \"RedHat\"\n\n  - name: Install\
-          \ the latest version of php on Debian\n    become: true\n    become_user:\
-          \ root\n    ansible.builtin.package:\n      name:\n        - php7.4\n  \
-          \      - php7.4-mysql\n        - php-common\n        - php7.4-cli\n    \
-          \    - php7.4-json\n        - php7.4-common\n        - php7.4-opcache\n\
-          \        - libapache2-mod-php7.4\n      state: latest\n    when: ansible_facts['os_family']\
-          \ == \"Debian\"\n\n  - name: Restart apache2 on Debian\n    become: true\n\
-          \    become_user: root\n    ansible.builtin.service:\n      name: apache2\n\
-          \      state: restarted\n    when: ansible_facts['os_family'] == \"Debian\""
+          \ latest\n    when: ansible_facts['os_family'] == \"Debian\"\n\n  - name:\
+          \ Restart apache2 on Debian\n    become: true\n    become_user: root\n \
+          \   ansible.builtin.service:\n      name: apache2\n      state: restarted\n\
+          \    when: ansible_facts['os_family'] == \"Debian\""
         ansible-ssh-passphrase-option: option.password
         ansible-ssh-use-agent: 'false'
       nodeStep: true

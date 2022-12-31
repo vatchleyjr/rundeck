@@ -1,0 +1,51 @@
+- defaultTab: output
+  description: ''
+  executionEnabled: true
+  group: Inventory
+  id: d78515d2-9dc7-419b-be14-ba2ad078e3c7
+  loglevel: INFO
+  multipleExecutions: true
+  name: Host
+  nodeFilterEditable: false
+  options:
+  - delimiter: ','
+    multivalued: true
+    name: hostname
+    required: true
+  plugins:
+    ExecutionLifecycle: null
+  scheduleEnabled: true
+  sequence:
+    commands:
+    - args: ${option.hostname} > /tmp/${job.execid}.hosts.yaml
+      description: Build Inventory File
+      fileExtension: py
+      interpreterArgsQuoted: false
+      script: "#!/usr/bin/env python\nimport socket\nimport sys\n\ndef writeInventory(servers):\n\
+        \    #print(\"# \"+{0})\n    print('---')\n    print('all:')\n    print(('\
+        \ ' * 2) + 'children:')\n    \n    print((' ' * 4) + 'servers:')\n    print(('\
+        \ ' * 6) + 'hosts:')\n    #for i in search('Rave Web', jData)\n    for i in\
+        \ servers:\n        print((' ' * 8) + i+':')\n        #print((' ' * 10) +\
+        \ 'vars:')\n        \n        a_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)\n\
+        \        a_socket.settimeout(5)\n        port = 22\n        location = (i,\
+        \ port)\n        check = a_socket.connect_ex(location)\n        if check ==\
+        \ 0:\n           print((' ' * 10) + \"ansible_user: \\\"{{ lookup('file',\
+        \ '/var/lib/rundeck/linux.usr') }}\\\"\")\n           print((' ' * 10) + \"\
+        ansible_password: \\\"{{ lookup('file', '/var/lib/rundeck/linux.pwd') }}\\\
+        \"\")\n           print((' ' * 10) + 'ansible_connection: ssh')\n        \
+        \   print((' ' * 10) + 'ansible_python_interpreter: /usr/bin/env python')\n\
+        \        else:\n           print((' ' * 10) + \"ansible_user: \\\"{{ lookup('file',\
+        \ '/var/lib/rundeck/windows.usr') }}\\\"\")\n           print((' ' * 10) +\
+        \ \"ansible_password: \\\"{{ lookup('file', '/var/lib/rundeck/windows.pwd')\
+        \ }}\\\"\")\n           print((' ' * 10) + 'ansible_connection: winrm')\n\
+        \           print((' ' * 10) + 'ansible_winrm_transport: basic')\n       \
+        \    #print((' ' * 10) + 'ansible_winrm_transport: kerberos')\n          \
+        \ #print((' ' * 10) + 'ansible_winrm_transport: ntlm')\n           #print(('\
+        \ ' * 10) + 'ansible_winrm_transport: credssp')\n           print((' ' * 10)\
+        \ + 'ansible_port: 5985')\n\ndef main():\n    servers = sys.argv[1].split(',')\n\
+        \    writeInventory(servers)\n\nif __name__ == \"__main__\":\n    main()"
+      scriptInterpreter: python3
+    keepgoing: false
+    strategy: node-first
+  uuid: d78515d2-9dc7-419b-be14-ba2ad078e3c7
+

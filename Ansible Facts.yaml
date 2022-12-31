@@ -1,0 +1,55 @@
+- defaultTab: output
+  description: ''
+  executionEnabled: true
+  id: fee9c85c-58c2-43a9-b2b3-309f739cb751
+  loglevel: INFO
+  multipleExecutions: true
+  name: Ansible Facts
+  nodeFilterEditable: false
+  options:
+  - delimiter: ','
+    multivalued: true
+    name: hostname
+    required: true
+  plugins:
+    ExecutionLifecycle: null
+  scheduleEnabled: true
+  sequence:
+    commands:
+    - jobref:
+        group: Inventory
+        importOptions: true
+        name: Host
+        nodeStep: 'true'
+        uuid: d78515d2-9dc7-419b-be14-ba2ad078e3c7
+    - configuration:
+        ansible-become: 'false'
+        ansible-extra-param: -i /tmp/${job.execid}.hosts.yaml --limit *
+        ansible-playbook-inline: |-
+          - name: Gathering Facts
+            hosts: all
+            gather_facts: true
+            vars:
+              ansible_python_interpreter: /usr/bin/env python
+
+            tasks:
+            #- name: populate service facts
+            #  service_facts:
+
+            - name: Ansible Basic Variable Example For Linux
+              debug:
+                msg: "{{ ansible_facts }}"
+              when: ansible_facts['system'] == "Linux"
+
+            - name: Ansible Basic Variable Example For Windows
+              debug:
+                msg: "{{ ansible_facts }}"
+              when: ansible_facts['system'] != "Linux"
+        ansible-ssh-passphrase-option: option.password
+        ansible-ssh-use-agent: 'false'
+      nodeStep: true
+      type: com.batix.rundeck.plugins.AnsiblePlaybookInlineWorkflowNodeStep
+    keepgoing: false
+    strategy: node-first
+  uuid: fee9c85c-58c2-43a9-b2b3-309f739cb751
+
